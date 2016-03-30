@@ -1,0 +1,35 @@
+---
+- name: Check if Php is installed
+  command: dpkg-query -l php5
+  register: is_installed
+  failed_when: is_installed.rc > 1
+  changed_when: no
+
+- name: Install xDebug
+  sudo: yes
+  apt: pkg=php5-xdebug state=latest
+  when: is_installed.rc == 0 and xdebug.install == '1'
+
+- name: Set cli export
+  lineinfile: dest=/etc/environment line="PHP_IDE_CONFIG='serverName={{ vm.hostname }}'"
+  when: is_installed.rc == 0 and xdebug.install == '1'
+
+- name: Create extension .ini file
+  template: >
+    src="xdebug.tpl"
+    dest="/etc/php5/mods-available/xdebug.ini"
+    owner="root"
+    group="root"
+    mode=0644
+  with_items:
+    - "{{ xdebug }}"
+  when: is_installed.rc == 0 and xdebug.install == '1'
+
+- name: Confirm ini install
+  stat: path=/etc/php5/mods-available/xdebug.ini
+  register: xdebug_ini
+
+- name: Enable extension
+  shell: php5enmod xdebug
+  when: xdebug_ini.stat.exists == True and is_installed.rc == 0 and xdebug.install == '1'
+

@@ -1,0 +1,20 @@
+---
+- hosts: all
+  sudo: true
+  vars_files:
+    - vars/merge-config.yml
+  roles:
+     - vm
+     - server
+     - ssh
+     - tmux
+     - git
+     - nodejs
+     - apache
+     - mariadb
+     - php
+#     - newrelic
+     - xdebug
+     - composer
+     - dotfiles
+     - app

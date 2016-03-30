@@ -1,0 +1,17 @@
+---
+- name: Check Tmux version
+  shell: tmux -V
+  register: tmux_version
+  when: tmux.version == '2'
+
+- name: Check for previous versions of Tmux
+  apt: name=tmux state=absent
+  when: tmux.install == '0'
+
+- name: Add new repository
+  apt_repository: repo='{{ tmux.repo }}' update_cache=yes
+  when: tmux.repo != '' and tmux.install == '1'
+
+- name: Install Tmux
+  apt: name={{ tmux.package }} state=present
+  when: tmux.install == '1'

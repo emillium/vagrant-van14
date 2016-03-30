@@ -1,0 +1,131 @@
+---
+vm:
+    box: emillium/trusty64 #s3than/trusty64
+    hostname: emillium.van14
+    environment: development #Currently only development environment has been tested
+    #Memory and Cpus if set to empty will use auto generated
+    memory: ''
+    cpus: ''
+    chosen_provider: virtualbox
+    ssh:
+        forward: '1'
+        known_hosts_command: "ssh-keyscan -t rsa -T 10"
+        known_hosts_file: "/etc/ssh/ssh_known_hosts"
+        known_hosts:
+          - github.com
+    network:
+        private_network: 192.168.14.10
+        forwarded_port:
+            ssh_forward_port:
+                host: '9592'
+                guest: '22'
+            mysql_forward_port:
+                host: '9593'
+                guest: '3306'
+            xdebug_forward_port:
+                host: '9002'
+                guest: '9001'
+    provider: # see [virtualbox](https://docs.vagrantup.com/v2/virtualbox/index.html) & [libvirt](https://github.com/pradels/vagrant-libvirt#domain-specific-options) for more options
+        virtualbox:
+            modifyvm:
+                natdnshostresolver1: 'on'
+                nictype1: virtio
+                nictype2: virtio
+                natdnsproxy1: 'on'
+    synced_folder:
+        project_folder:
+            sync_type: 'default'
+            host_machine:  ./project_files
+            guest_machine: /home/vagrant/project_files
+            owner: vagrant
+            group: www-data
+    usable_port_range:
+        start: 9000
+        stop: 10500
+server:
+    install: '1'
+    packages: [htop, imagemagick, multitail, ant, xvfb, chromium-browser]
+    timezone: UTC
+    locale: en_AU.UTF-8
+    swap:
+        swap_file_path: /swapfile
+        # Use any of the following suffixes
+        # c=1
+        # w=2
+        # b=512
+        # kB=1000
+        # K=1024
+        # MB=1000*1000
+        # M=1024*1024
+        # xM=M
+        # GB=1000*1000*1000
+        # G=1024*1024*1024
+        swap_file_size: 2048M
+        swappiness: 50
+    hosts:
+        - url: 127.0.0.1
+          name: localhost
+          local: '1'
+tmux:
+    install: '1'
+    repo: 'ppa:pi-rho/dev'
+    package: 'tmux=2.0-1~ppa1~t'
+    version: '2'
+dot_files:
+    install: '0'
+    dot_files_url: ''
+git:
+    install: '1'
+apache:
+    install: '1'
+mariadb:
+    install: '1'
+    root_password: '123'
+    database: db
+    options:
+        bind_address: '0.0.0.0'
+    users:
+        - { name: dbuser, host: '%', password: 1234, priv: '*.*:ALL,GRANT' }
+    dump: ''
+    adminer: '1'
+php:
+    install: '1'
+    ppa: php5
+    ioncube: '1'
+    packages: [php5-cli, php5-curl, php-http, php5-imagick, php5-intl, php5-mcrypt, php5-mysql, php5-redis, php5-ssh2, php5-memcached]
+    pecl_with_dependents:
+        - package: pecl_http-2.5.5
+          package_name: http
+          depends_on:
+               - package: raphf-1.1.2
+                 package_name: raphf
+                 priority: 25
+               - package: propro-1.0.2
+                 package_name: propro
+                 priority: 30
+          priority: 35
+xdebug:
+    install: '1'
+    idekey: 'PHPSTORM'
+    remote_enable: 'on'
+    remote_mode: 'req'
+    remote_port: '9001'
+    remote_connect_back: 'on'
+    profiler_enable: 'off'
+    profiler_enable_trigger: 'on'
+    remote_autostart: 'on'
+    max_nesting_level: 300
+    cli_color: 1
+composer:
+    install: '1'
+    auth: ''
+nodejs:
+    install: '1'
+    nodejs_version: '0.12'
+    nodejs_forever: false
+    nodejs_npm_global_packages:
+      - name: bower
+      - name: grunt-cli
+java:
+    java_version: '8'
+    install: '1'
